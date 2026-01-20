@@ -1,0 +1,1 @@
+export { StudentRegister } from './StudentRegister';

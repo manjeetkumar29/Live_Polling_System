@@ -1,0 +1,46 @@
+.teacher-dashboard {
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 40px;
+}
+
+.teacher-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.view-history-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 24px;
+}
+
+.poll-creator-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.live-poll-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.poll-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.ask-new-question-btn {
+  align-self: center;
+  margin-top: 16px;
+}

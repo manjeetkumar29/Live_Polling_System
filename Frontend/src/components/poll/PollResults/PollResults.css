@@ -1,0 +1,85 @@
+.poll-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.poll-question-header {
+  background: #374151;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.question-text {
+  font-weight: 500;
+}
+
+.poll-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.poll-option-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.option-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.option-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.option-text {
+  font-size: 14px;
+  color: #374151;
+}
+
+.option-bar-wrapper {
+  flex: 1;
+  height: 32px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.option-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+}
+
+.option-percentage {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  min-width: 40px;
+  text-align: right;
+}
+
+.total-votes {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: right;
+}
