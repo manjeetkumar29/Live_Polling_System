@@ -1,99 +1,15 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { socketService } from '../services';
 import { useAppStore } from '../store';
-import type { Poll, Student, Message } from '../types';
+import type { Poll, Message } from '../types';
 
 export const useSocket = () => {
   const {
     user,
     setCurrentPoll,
-    setStudents,
-    setMessages,
-    addMessage,
     setRemainingTime,
-    setIsConnected,
-    setIsKicked,
     setHasVoted,
   } = useAppStore();
-
-  useEffect(() => {
-    const socket = socketService.connect();
-
-    socket.on('connect', () => {
-      setIsConnected(true);
-    });
-
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-    });
-
-    // Poll events
-    socket.on('poll:current', (poll: Poll) => {
-      setCurrentPoll(poll);
-      setRemainingTime(poll.remainingTime);
-    });
-
-    socket.on('poll:new', (poll: Poll) => {
-      setCurrentPoll(poll);
-      setRemainingTime(poll.remainingTime);
-      setHasVoted(false);
-    });
-
-    socket.on('poll:results', (poll: Poll) => {
-      setCurrentPoll(poll);
-    });
-
-    socket.on('poll:ended', (poll: Poll) => {
-      setCurrentPoll(poll);
-      setRemainingTime(0);
-    });
-
-    // Timer events
-    socket.on('timer:update', ({ remainingTime }: { pollId: string; remainingTime: number }) => {
-      setRemainingTime(remainingTime);
-    });
-
-    // Student events
-    socket.on('students:list', (students: Student[]) => {
-      setStudents(students);
-    });
-
-    socket.on('student:kicked', () => {
-      setIsKicked(true);
-    });
-
-    // Chat events
-    socket.on('chat:history', (messages: Message[]) => {
-      setMessages(messages);
-    });
-
-    socket.on('chat:message', (message: Message) => {
-      addMessage(message);
-    });
-
-    return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('poll:current');
-      socket.off('poll:new');
-      socket.off('poll:results');
-      socket.off('poll:ended');
-      socket.off('timer:update');
-      socket.off('students:list');
-      socket.off('student:kicked');
-      socket.off('chat:history');
-      socket.off('chat:message');
-    };
-  }, [
-    setCurrentPoll,
-    setStudents,
-    setMessages,
-    addMessage,
-    setRemainingTime,
-    setIsConnected,
-    setIsKicked,
-    setHasVoted,
-  ]);
 
   // Register student
   const registerStudent = useCallback(

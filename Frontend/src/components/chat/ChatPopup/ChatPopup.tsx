@@ -76,12 +76,16 @@ export const ChatPopup: React.FC<ChatPopupProps> = ({
               {messages.map((msg) => (
                 <div
                   key={msg._id}
-                  className={`chat-message ${
+                  className={`chat-message-wrapper ${
                     msg.senderId === user?.sessionId ? 'own' : ''
-                  } ${msg.senderRole === 'teacher' ? 'teacher' : ''}`}
+                  }`}
                 >
                   <span className="message-sender">{msg.senderName}</span>
-                  <span className="message-content">{msg.content}</span>
+                  <div className={`chat-message ${
+                    msg.senderId === user?.sessionId ? 'own' : ''
+                  }`}>
+                    <span className="message-content">{msg.content}</span>
+                  </div>
                 </div>
               ))}
               <div ref={messagesEndRef} />
