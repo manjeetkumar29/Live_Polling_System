@@ -23,13 +23,10 @@ const clearPollHistory = async (): Promise<void> => {
     const pollsResult = await db.collection('polls').deleteMany({});
     console.log(`Deleted ${pollsResult.deletedCount} polls`);
 
-    const messagesResult = await db.collection('messages').deleteMany({});
-    console.log(`Deleted ${messagesResult.deletedCount} messages`);
-
-    console.log('\n✅ Poll and chat history cleared successfully!');
+    console.log('\n✅ Poll history cleared successfully!');
     
   } catch (error) {
-    console.error('Error clearing history:', error);
+    console.error('Error clearing poll history:', error);
   } finally {
     await mongoose.disconnect();
     console.log('MongoDB disconnected');
