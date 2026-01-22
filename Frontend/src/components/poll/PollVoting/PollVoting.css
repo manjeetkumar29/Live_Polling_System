@@ -1,6 +1,12 @@
 .poll-voting {
-  max-width: 500px;
+  width: 727px;
+  max-width: 100%;
   margin: 0 auto;
+}
+
+.poll-voting-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .poll-voting-header {
@@ -8,6 +14,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .question-number {
@@ -36,28 +43,31 @@
 }
 
 .poll-question-box {
-  background: #374151;
+  background: linear-gradient(to right, #373737, #6E6E6E);
   color: white;
-  padding: 16px 20px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 8px 8px 0 0;
   font-size: 14px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .poll-voting-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 8px;
+  border: 2px solid #7765DA;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 16px;
 }
 
 .voting-option {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: #f8fafc;
-  border: 2px solid #e5e7eb;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -66,19 +76,19 @@
 }
 
 .voting-option:hover:not(.disabled) {
-  border-color: #6366f1;
-  background: #f0f0ff;
+  border-color: #7765DA;
+  background: #f8f7ff;
 }
 
 .voting-option.selected {
-  border-color: #6366f1;
-  background: #6366f1;
+  border-color: #7765DA;
+  background: #7765DA;
   color: white;
 }
 
 .voting-option.selected .option-number {
   background: white;
-  color: #6366f1;
+  color: #7765DA;
 }
 
 .voting-option.disabled {
@@ -90,12 +100,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: #6366f1;
+  width: 24px;
+  height: 24px;
+  background: #7765DA;
   color: white;
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -106,5 +116,7 @@
 }
 
 .poll-voting-footer {
+  display: flex;
+  justify-content: center;
   padding-top: 8px;
 }

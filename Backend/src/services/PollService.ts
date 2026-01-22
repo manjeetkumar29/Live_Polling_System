@@ -136,6 +136,23 @@ class PollService {
     const endTime = new Date(poll.startedAt.getTime() + poll.duration * 1000);
     return Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 1000));
   }
+
+  // Get the latest poll (active or most recently ended)
+  async getLatestPoll(): Promise<IPoll | null> {
+    // First try to get active poll
+    const activePoll = await Poll.findOne({ isActive: true });
+    if (activePoll) return activePoll;
+
+    // Otherwise get the most recently created poll
+    return Poll.findOne().sort({ createdAt: -1 });
+  }
+
+  // Get latest poll with results
+  async getLatestPollWithResults(): Promise<PollWithResults | null> {
+    const poll = await this.getLatestPoll();
+    if (!poll) return null;
+    return this.getPollWithResults(poll._id.toString());
+  }
 }
 
 export const pollService = new PollService();

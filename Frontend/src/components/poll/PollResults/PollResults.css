@@ -1,42 +1,68 @@
 .poll-results {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
+  width: 727px;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .poll-question-header {
-  background: #374151;
+  background: linear-gradient(to right, #373737, #6E6E6E);
   color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 8px 8px 0 0;
   font-size: 14px;
+}
+
+.poll-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 2px solid #7765DA;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 16px;
 }
 
 .question-text {
   font-weight: 500;
 }
 
-.poll-options-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .poll-option-result {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border: 2px solid #6366f1;
+  padding: 10px 16px;
+  border: 1px solid #E5E7EB;
   border-radius: 8px;
-  background: #f8fafc;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.poll-option-result.clickable {
+  cursor: pointer;
+}
+
+.poll-option-result.clickable:hover {
+  border-color: #7765DA;
+  background: #f8f7ff;
+}
+
+.poll-option-result.selected {
+  border-color: #7765DA;
+  border-width: 2px;
 }
 
 .option-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-width: 120px;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+  flex: 1;
 }
 
 .option-indicator {
@@ -46,44 +72,50 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  color: white;
+  background: #ffffff;
+  color: #374151;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   flex-shrink: 0;
+  border: 1px solid #E5E7EB;
 }
 
 .option-text {
   font-size: 14px;
   color: #374151;
+  font-weight: 500;
 }
 
 .option-bar-wrapper {
-  flex: 1;
-  height: 32px;
-  background: #f1f5f9;
-  border-radius: 6px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 1;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .option-bar {
   height: 100%;
-  border-radius: 6px;
+  background: #7765DA;
   transition: width 0.3s ease;
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
 }
 
 .option-percentage {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
-  min-width: 40px;
+  min-width: 45px;
   text-align: right;
+  position: relative;
+  z-index: 2;
 }
 
 .total-votes {
   font-size: 13px;
   color: #6b7280;
   text-align: right;
+  display: none;
 }

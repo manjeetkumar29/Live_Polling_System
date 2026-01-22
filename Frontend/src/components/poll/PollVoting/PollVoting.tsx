@@ -41,24 +41,26 @@ export const PollVoting: React.FC<PollVotingProps> = ({
         </span>
       </div>
 
-      <div className="poll-question-box">
-        <span>{poll.question}</span>
-      </div>
+      <div className="poll-voting-container">
+        <div className="poll-question-box">
+          <span>{poll.question}</span>
+        </div>
 
-      <div className="poll-voting-options">
-        {poll.options.map((option, index) => (
-          <button
-            key={option.id}
-            className={`voting-option ${selectedOption === option.id ? 'selected' : ''} ${
-              hasVoted ? 'disabled' : ''
-            }`}
-            onClick={() => !hasVoted && setSelectedOption(option.id)}
-            disabled={hasVoted}
-          >
-            <span className="option-number">{index + 1}</span>
-            <span className="option-label">{option.text}</span>
-          </button>
-        ))}
+        <div className="poll-voting-options">
+          {poll.options.map((option, index) => (
+            <button
+              key={option.id}
+              className={`voting-option ${selectedOption === option.id ? 'selected' : ''} ${
+                hasVoted ? 'disabled' : ''
+              }`}
+              onClick={() => !hasVoted && setSelectedOption(option.id)}
+              disabled={hasVoted}
+            >
+              <span className="option-number">{index + 1}</span>
+              <span className="option-label">{option.text}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {!hasVoted && (

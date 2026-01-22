@@ -3,6 +3,10 @@ import { persist } from 'zustand/middleware';
 import type { User, UserRole, Poll, Student, Message } from '../types';
 
 interface AppState {
+  // Hydration state
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
+
   // User state
   user: User | null;
   setUser: (user: User | null) => void;
@@ -45,6 +49,7 @@ interface AppState {
 }
 
 const initialState = {
+  _hasHydrated: false,
   user: null,
   currentPoll: null,
   pollHistory: [],
@@ -61,6 +66,9 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       ...initialState,
+
+      // Hydration actions
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       // User actions
       setUser: (user) => set({ user }),
@@ -105,7 +113,13 @@ export const useAppStore = create<AppState>()(
       name: 'polling-app-storage',
       partialize: (state) => ({
         user: state.user,
+        currentPoll: state.currentPoll,
+        hasVoted: state.hasVoted,
+        remainingTime: state.remainingTime,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

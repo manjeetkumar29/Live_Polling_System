@@ -18,12 +18,12 @@
 
 /* Variants */
 .btn-primary {
-  background: #6366f1;
+  background: #7765DA;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #5558e3;
+  background: #6554c9;
 }
 
 .btn-secondary {

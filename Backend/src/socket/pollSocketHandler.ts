@@ -69,9 +69,10 @@ export const setupSocketHandlers = (io: Server) => {
 
     // Send current state on connection
     const sendCurrentState = async () => {
-      const activePoll = await pollService.getActivePollWithResults();
-      if (activePoll) {
-        socket.emit('poll:current', activePoll);
+      // Send the latest poll (active or most recently ended)
+      const latestPoll = await pollService.getLatestPollWithResults();
+      if (latestPoll) {
+        socket.emit('poll:current', latestPoll);
       }
 
       const students = await studentService.getAllActiveStudents();
@@ -227,14 +228,15 @@ export const setupSocketHandlers = (io: Server) => {
     // Get current poll state (for page refresh recovery)
     socket.on('poll:getCurrent', async (payload: { studentId?: string }, callback) => {
       try {
-        const activePoll = await pollService.getActivePollWithResults();
+        // Get the latest poll (active or most recently ended) for recovery on refresh
+        const latestPoll = await pollService.getLatestPollWithResults();
         
         let hasVoted = false;
-        if (activePoll && payload.studentId) {
-          hasVoted = await voteService.hasStudentVoted(activePoll._id, payload.studentId);
+        if (latestPoll && payload.studentId) {
+          hasVoted = await voteService.hasStudentVoted(latestPoll._id, payload.studentId);
         }
 
-        callback?.({ success: true, poll: activePoll, hasVoted });
+        callback?.({ success: true, poll: latestPoll, hasVoted });
       } catch (error: any) {
         console.error('Error getting current poll:', error);
         callback?.({ success: false, message: error.message });

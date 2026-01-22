@@ -2,11 +2,13 @@
   min-height: 100vh;
   background: #ffffff;
   padding: 40px;
+  display: flex;
+  justify-content: center;
 }
 
 .teacher-content {
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 900px;
 }
 
 .view-history-btn-wrapper {
@@ -31,6 +33,15 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: center;
+}
+
+.poll-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 727px;
+  max-width: 100%;
 }
 
 .section-title {
@@ -38,6 +49,25 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0;
+}
+
+.poll-timer {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ef4444;
+}
+
+.poll-timer.timer-low {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .ask-new-question-btn {
