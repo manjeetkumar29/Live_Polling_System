@@ -152,57 +152,65 @@ Live_Polling_System/
    - Backend API: http://localhost:5000
 
 ## Usage
+### Teacher flow
+1.  Open the app and choose Teacher.
+2.  Create a poll by providing Question text, Options (2+) , Duration (seconds, max 60).
+3.  Press Start Poll. The server starts the authoritative timer and broadcasts poll:new.
+4.  Watch the live dashboard update as students vote.
+5.  After the timer ends or all students answer, results are finalized and stored in DB.
+6.  Access poll history page for list of past polls and final aggregates.
+### Student flow
+1.  Open and choose Student.
+2.  Enter a unique display name for that browser tab/session.
+3.  Wait for teacher to start a poll. When poll:new arrives, the UI shows the question and a synchronized timer.
+4.  Submit vote once. The client prevents multiple votes UI-side, and server enforces single-vote server-side.
+5.  After voting or when time expires, see the live results view.
 
-### As a Teacher
-1. Go to the welcome page and select "I'm a Teacher"
-2. Create a poll with a question, options, and duration
-3. Watch real-time results as students vote
-4. Use the chat feature to communicate with students
-5. View poll history to see past results
-
-### As a Student
-1. Go to the welcome page and select "I'm a Student"
-2. Enter your name to register
-3. Wait for the teacher to create a poll
-4. Answer the question within the time limit
-5. View results after submitting
-6. Use the chat feature to communicate
 
 ## Architecture
 
 ### Backend
-- **Separation of Concerns**: Socket handlers delegate to services
-- **Services**: Business logic in PollService, VoteService, etc.
-- **Models**: Mongoose schemas for data persistence
-- **Error Handling**: Graceful handling of database errors
+- *Separation of Concerns*: Socket handlers delegate to services
+- *Services*: Business logic in PollService, VoteService, etc.
+- *Models*: Mongoose schemas for data persistence
+- *Error Handling*: Graceful handling of database errors
 
 ### Frontend
-- **Custom Hooks**: useSocket for socket operations, usePollTimer for timer logic
-- **State Management**: Zustand with persistence for user data
-- **Component Architecture**: Reusable components in common/ folder
+- *Custom Hooks*: useSocket for socket operations, usePollTimer for timer logic
+- *State Management*: Zustand with persistence for user data
+- *Component Architecture*: Reusable components in common/ folder
 
 ## API Events (Socket.io)
 
 ### Teacher Events
-- `poll:create` - Create a new poll
-- `poll:history` - Get poll history
-- `student:kick` - Remove a student
+- poll:create - Create a new poll
+- poll:history - Get poll history
+- student:kick - Remove a student
 
 ### Student Events
-- `student:register` - Register with name
-- `vote:submit` - Submit a vote
+- student:register - Register with name
+- vote:submit - Submit a vote
 
 ### Common Events
-- `poll:getCurrent` - Get current poll state (for recovery)
-- `chat:send` - Send a chat message
+- poll:getCurrent - Get current poll state (for recovery)
+- chat:send - Send a chat message
 
 ### Server Events
-- `poll:new` - New poll created
-- `poll:results` - Updated results
-- `poll:ended` - Poll has ended
-- `timer:update` - Timer tick
-- `students:list` - Updated student list
-- `chat:message` - New chat message
+- poll:new - New poll created
+- poll:results - Updated results
+- poll:ended - Poll has ended
+- timer:update - Timer tick
+- students:list - Updated student list
+- chat:message - New chat message
+
+
+
+## Manual Tests Done
+1.  `Single teacher, multiple students:` one teacher and multiple student tabs; created poll; verified votes update in real-time and final result is correct.
+2.  `Late join:` started poll with 60s; Started a student tab after 10s; verified student timer shows ~50s.
+3.  `Refresh recovery:` refreshed teacher or student tab mid-poll; verified UI recovers to current state and timer resumes.
+4.  `Double-vote prevention:` attempted to vote twice from same session and from different tools; server rejected duplicate. Verified DB has single vote per { pollId, studentId }.
+5.  `DB outage:` stopped MongoDB and attempt operations; verified that error handling is done correctly.
 
 ## Deployment
 
@@ -214,6 +222,11 @@ Deploy to any static hosting (Vercel, Netlify, etc.)
 
 Update environment variables accordingly.
 
-## License
 
-MIT
+## Design Reference
+•   Figma design: https://www.figma.com/design/uhinheFgWssbxvlI7wtf59/Intervue-Assigment--Poll-system?node-id=0-1&t=Y5
+
+## License & Contact
+-   License: MIT
+-   Author / Maintainer: `Manjeet Kumar`
+-   Contact Info:- +91-9140705127 |  manjeetkumar369423@gmail.com
