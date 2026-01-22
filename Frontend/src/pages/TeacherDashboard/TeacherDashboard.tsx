@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { Badge, Button } from '../../components/common';
-import { PollCreator } from '../../components/teacher/PollCreator';
-import { PollResults, PollHistory } from '../../components/poll';
-import { ChatPopup } from '../../components/chat';
-import { useSocket, usePollTimer } from '../../hooks';
-import { useAppStore } from '../../store';
-import type { Poll } from '../../types';
-import './TeacherDashboard.css';
+import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import { Badge, Button } from "../../components/common";
+import { PollCreator } from "../../components/teacher/PollCreator";
+import { PollResults, PollHistory } from "../../components/poll";
+import { ChatPopup } from "../../components/chat";
+import { useSocket, usePollTimer } from "../../hooks";
+import { useAppStore } from "../../store";
+import type { Poll } from "../../types";
+import "./TeacherDashboard.css";
 
 export const TeacherDashboard: React.FC = () => {
-  const { currentPoll, students, user, setUser, setCurrentPoll } = useAppStore();
-  const { createPoll, getPollHistory, kickStudent, getCurrentPoll } = useSocket();
-  const { remainingTime, formattedTime, isLowTime } = usePollTimer();
+  const { currentPoll, students, user, setUser, setCurrentPoll } =
+    useAppStore();
+  const { createPoll, getPollHistory, kickStudent, getCurrentPoll } =
+    useSocket();
+  const { formattedTime, isLowTime } = usePollTimer();
   const [isCreating, setIsCreating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [pollHistory, setPollHistory] = useState<Poll[]>([]);
@@ -22,8 +24,8 @@ export const TeacherDashboard: React.FC = () => {
   useEffect(() => {
     if (!user?.name) {
       setUser({
-        role: 'teacher',
-        name: 'Teacher',
+        role: "teacher",
+        name: "Teacher",
         sessionId: user?.sessionId || `teacher-${Date.now()}`,
       });
     }
@@ -44,29 +46,47 @@ export const TeacherDashboard: React.FC = () => {
   const handleCreatePoll = async (
     question: string,
     options: { id: string; text: string; isCorrect: boolean }[],
-    duration: number
+    duration: number,
   ) => {
     setIsCreating(true);
     try {
       const result = await createPoll(question, options, duration);
       if (result.success) {
-        toast.success('Poll created successfully!');
+        toast.success("Poll created successfully!");
         setShowPollCreator(false);
       } else {
-        toast.error(result.message || 'Failed to create poll');
+        toast.error(result.message || "Failed to create poll");
       }
     } catch (error) {
-      toast.error('Failed to create poll');
+      toast.error("Failed to create poll");
     } finally {
       setIsCreating(false);
     }
   };
 
   const handleViewHistory = async () => {
-    const result = await getPollHistory();
-    if (result.success && result.polls) {
-      setPollHistory(result.polls);
-      setShowHistory(true);
+    try {
+      console.log("[TeacherDashboard] Fetching poll history...");
+      const result = await getPollHistory();
+      console.log("[TeacherDashboard] Poll history result:", result);
+
+      if (result.success && result.polls) {
+        console.log(
+          "[TeacherDashboard] Setting poll history with",
+          result.polls.length,
+          "polls",
+        );
+        setPollHistory(result.polls);
+        setShowHistory(true);
+        toast.success(`Loaded ${result.polls.length} previous polls`);
+      } else {
+        const message = result.message || "Failed to load poll history";
+        console.error("[TeacherDashboard] History fetch failed:", message);
+        toast.error(message);
+      }
+    } catch (error) {
+      console.error("[TeacherDashboard] Error fetching poll history:", error);
+      toast.error("Failed to load poll history");
     }
   };
 
@@ -78,9 +98,9 @@ export const TeacherDashboard: React.FC = () => {
   const handleKickStudent = async (sessionId: string) => {
     const result = await kickStudent(sessionId);
     if (result.success) {
-      toast.success('Student removed');
+      toast.success("Student removed");
     } else {
-      toast.error('Failed to remove student');
+      toast.error("Failed to remove student");
     }
   };
 
@@ -100,14 +120,17 @@ export const TeacherDashboard: React.FC = () => {
         {showPollCreatorView ? (
           <div className="poll-creator-wrapper">
             <Badge />
-            <PollCreator onCreatePoll={handleCreatePoll} isLoading={isCreating} />
+            <PollCreator
+              onCreatePoll={handleCreatePoll}
+              isLoading={isCreating}
+            />
           </div>
         ) : (
           <div className="live-poll-wrapper">
             <div className="poll-section">
               <div className="poll-header">
                 <h2 className="section-title">Question</h2>
-                <span className={`poll-timer ${isLowTime ? 'timer-low' : ''}`}>
+                <span className={`poll-timer ${isLowTime ? "timer-low" : ""}`}>
                   ⏱ {formattedTime}
                 </span>
               </div>
@@ -131,7 +154,10 @@ export const TeacherDashboard: React.FC = () => {
       />
 
       {showHistory && (
-        <PollHistory polls={pollHistory} onClose={() => setShowHistory(false)} />
+        <PollHistory
+          polls={pollHistory}
+          onClose={() => setShowHistory(false)}
+        />
       )}
     </div>
   );

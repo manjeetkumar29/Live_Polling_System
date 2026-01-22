@@ -1,7 +1,12 @@
-import React, { createContext, useContext, useEffect, useRef, type ReactNode } from 'react';
-import { socketService } from '../services';
-import { useAppStore } from '../store';
-import type { Poll, Student, Message } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { socketService } from "../services";
+import { useAppStore } from "../store";
+import type { Poll, Student, Message } from "../types";
 
 interface SocketContextType {
   isConnected: boolean;
@@ -9,7 +14,9 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType>({ isConnected: false });
 
-export const SocketProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const SocketProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const {
     user,
     setCurrentPoll,
@@ -23,20 +30,18 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     isConnected,
   } = useAppStore();
 
-  const hasRecoveredState = useRef(false);
-
   useEffect(() => {
     const socket = socketService.connect();
 
     const handleConnect = () => {
       setIsConnected(true);
-      
+
       // On reconnection, verify state from backend
       const currentUser = useAppStore.getState().user;
-      if (currentUser?.sessionId && currentUser?.role === 'student') {
+      if (currentUser?.sessionId && currentUser?.role === "student") {
         // Re-register student and recover state on reconnection
         socketService.emit(
-          'student:register',
+          "student:register",
           { sessionId: currentUser.sessionId, name: currentUser.name },
           (response: any) => {
             if (response.success) {
@@ -47,19 +52,19 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
               // Always trust server's hasVoted status
               setHasVoted(response.hasVoted || false);
             }
-          }
+          },
         );
       } else {
         // For teacher, just get current poll state
         socketService.emit(
-          'poll:getCurrent',
+          "poll:getCurrent",
           { studentId: currentUser?.sessionId },
           (response: any) => {
             if (response.success && response.poll) {
               setCurrentPoll(response.poll);
               setRemainingTime(response.poll.remainingTime);
             }
-          }
+          },
         );
       }
     };
@@ -88,7 +93,12 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       setRemainingTime(0);
     };
 
-    const handleTimerUpdate = ({ remainingTime }: { pollId: string; remainingTime: number }) => {
+    const handleTimerUpdate = ({
+      remainingTime,
+    }: {
+      pollId: string;
+      remainingTime: number;
+    }) => {
       setRemainingTime(remainingTime);
     };
 
@@ -108,30 +118,30 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       addMessage(message);
     };
 
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    socket.on('poll:current', handlePollCurrent);
-    socket.on('poll:new', handlePollNew);
-    socket.on('poll:results', handlePollResults);
-    socket.on('poll:ended', handlePollEnded);
-    socket.on('timer:update', handleTimerUpdate);
-    socket.on('students:list', handleStudentsList);
-    socket.on('student:kicked', handleStudentKicked);
-    socket.on('chat:history', handleChatHistory);
-    socket.on('chat:message', handleChatMessage);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("poll:current", handlePollCurrent);
+    socket.on("poll:new", handlePollNew);
+    socket.on("poll:results", handlePollResults);
+    socket.on("poll:ended", handlePollEnded);
+    socket.on("timer:update", handleTimerUpdate);
+    socket.on("students:list", handleStudentsList);
+    socket.on("student:kicked", handleStudentKicked);
+    socket.on("chat:history", handleChatHistory);
+    socket.on("chat:message", handleChatMessage);
 
     return () => {
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-      socket.off('poll:current', handlePollCurrent);
-      socket.off('poll:new', handlePollNew);
-      socket.off('poll:results', handlePollResults);
-      socket.off('poll:ended', handlePollEnded);
-      socket.off('timer:update', handleTimerUpdate);
-      socket.off('students:list', handleStudentsList);
-      socket.off('student:kicked', handleStudentKicked);
-      socket.off('chat:history', handleChatHistory);
-      socket.off('chat:message', handleChatMessage);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("poll:current", handlePollCurrent);
+      socket.off("poll:new", handlePollNew);
+      socket.off("poll:results", handlePollResults);
+      socket.off("poll:ended", handlePollEnded);
+      socket.off("timer:update", handleTimerUpdate);
+      socket.off("students:list", handleStudentsList);
+      socket.off("student:kicked", handleStudentKicked);
+      socket.off("chat:history", handleChatHistory);
+      socket.off("chat:message", handleChatMessage);
     };
   }, [
     user,

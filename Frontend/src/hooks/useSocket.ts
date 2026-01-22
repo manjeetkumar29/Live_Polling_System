@@ -1,22 +1,21 @@
-import { useCallback } from 'react';
-import { socketService } from '../services';
-import { useAppStore } from '../store';
-import type { Poll, Message } from '../types';
+import { useCallback } from "react";
+import { socketService } from "../services";
+import { useAppStore } from "../store";
+import type { Poll, Message } from "../types";
 
 export const useSocket = () => {
-  const {
-    user,
-    setCurrentPoll,
-    setRemainingTime,
-    setHasVoted,
-  } = useAppStore();
+  const { user, setCurrentPoll, setRemainingTime, setHasVoted } = useAppStore();
 
   // Register student
   const registerStudent = useCallback(
     (sessionId: string, name: string) => {
-      return new Promise<{ success: boolean; hasVoted?: boolean; message?: string }>((resolve) => {
+      return new Promise<{
+        success: boolean;
+        hasVoted?: boolean;
+        message?: string;
+      }>((resolve) => {
         socketService.emit(
-          'student:register',
+          "student:register",
           { sessionId, name },
           (response: any) => {
             if (response.success && response.activePoll) {
@@ -25,27 +24,33 @@ export const useSocket = () => {
               setHasVoted(response.hasVoted);
             }
             resolve(response);
-          }
+          },
         );
       });
     },
-    [setCurrentPoll, setRemainingTime, setHasVoted]
+    [setCurrentPoll, setRemainingTime, setHasVoted],
   );
 
   // Create poll
   const createPoll = useCallback(
-    (question: string, options: { id: string; text: string; isCorrect: boolean }[], duration: number) => {
-      return new Promise<{ success: boolean; poll?: Poll; message?: string }>((resolve) => {
-        socketService.emit(
-          'poll:create',
-          { question, options, duration },
-          (response: any) => {
-            resolve(response);
-          }
-        );
-      });
+    (
+      question: string,
+      options: { id: string; text: string; isCorrect: boolean }[],
+      duration: number,
+    ) => {
+      return new Promise<{ success: boolean; poll?: Poll; message?: string }>(
+        (resolve) => {
+          socketService.emit(
+            "poll:create",
+            { question, options, duration },
+            (response: any) => {
+              resolve(response);
+            },
+          );
+        },
+      );
     },
-    []
+    [],
   );
 
   // Submit vote
@@ -53,7 +58,7 @@ export const useSocket = () => {
     (pollId: string, optionId: string) => {
       return new Promise<{ success: boolean; message?: string }>((resolve) => {
         socketService.emit(
-          'vote:submit',
+          "vote:submit",
           {
             pollId,
             optionId,
@@ -65,26 +70,33 @@ export const useSocket = () => {
               setHasVoted(true);
             }
             resolve(response);
-          }
+          },
         );
       });
     },
-    [user, setHasVoted]
+    [user, setHasVoted],
   );
 
   // Get poll history
   const getPollHistory = useCallback(() => {
-    return new Promise<{ success: boolean; polls?: Poll[]; message?: string }>((resolve) => {
-      socketService.emit('poll:history', null, (response: any) => {
-        resolve(response);
-      });
-    });
+    return new Promise<{ success: boolean; polls?: Poll[]; message?: string }>(
+      (resolve) => {
+        console.log("[useSocket.getPollHistory] Emitting poll:history event");
+        socketService.emit("poll:history", null, (response: any) => {
+          console.log(
+            "[useSocket.getPollHistory] Received response:",
+            response,
+          );
+          resolve(response);
+        });
+      },
+    );
   }, []);
 
   // Kick student
   const kickStudent = useCallback((sessionId: string) => {
     return new Promise<{ success: boolean; message?: string }>((resolve) => {
-      socketService.emit('student:kick', { sessionId }, (response: any) => {
+      socketService.emit("student:kick", { sessionId }, (response: any) => {
         resolve(response);
       });
     });
@@ -95,38 +107,40 @@ export const useSocket = () => {
     (content: string) => {
       return new Promise<{ success: boolean; message?: Message }>((resolve) => {
         socketService.emit(
-          'chat:send',
+          "chat:send",
           {
             senderId: user?.sessionId,
-            senderName: user?.name || 'Teacher',
+            senderName: user?.name || "Teacher",
             senderRole: user?.role,
             content,
           },
           (response: any) => {
             resolve(response);
-          }
+          },
         );
       });
     },
-    [user]
+    [user],
   );
 
   // Get current poll (for state recovery)
   const getCurrentPoll = useCallback(() => {
-    return new Promise<{ success: boolean; poll?: Poll; hasVoted?: boolean }>((resolve) => {
-      socketService.emit(
-        'poll:getCurrent',
-        { studentId: user?.sessionId },
-        (response: any) => {
-          if (response.success && response.poll) {
-            setCurrentPoll(response.poll);
-            setRemainingTime(response.poll.remainingTime);
-            setHasVoted(response.hasVoted);
-          }
-          resolve(response);
-        }
-      );
-    });
+    return new Promise<{ success: boolean; poll?: Poll; hasVoted?: boolean }>(
+      (resolve) => {
+        socketService.emit(
+          "poll:getCurrent",
+          { studentId: user?.sessionId },
+          (response: any) => {
+            if (response.success && response.poll) {
+              setCurrentPoll(response.poll);
+              setRemainingTime(response.poll.remainingTime);
+              setHasVoted(response.hasVoted);
+            }
+            resolve(response);
+          },
+        );
+      },
+    );
   }, [user, setCurrentPoll, setRemainingTime, setHasVoted]);
 
   return {

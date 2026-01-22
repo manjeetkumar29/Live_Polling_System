@@ -1,6 +1,6 @@
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from "socket.io-client";
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
 
 class SocketService {
   private socket: Socket | null = null;
@@ -18,23 +18,23 @@ class SocketService {
   connect(): Socket {
     if (!this.socket) {
       this.socket = io(SOCKET_URL, {
-        transports: ['websocket', 'polling'],
+        transports: ["websocket", "polling"],
         autoConnect: true,
         reconnection: true,
         reconnectionAttempts: 10,
         reconnectionDelay: 1000,
       });
 
-      this.socket.on('connect', () => {
-        console.log('Connected to server');
+      this.socket.on("connect", () => {
+        console.log("Connected to server");
       });
 
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from server');
+      this.socket.on("disconnect", () => {
+        console.log("Disconnected from server");
       });
 
-      this.socket.on('connect_error', (error) => {
-        console.error('Connection error:', error);
+      this.socket.on("connect_error", (error) => {
+        console.error("Connection error:", error);
       });
     }
     return this.socket;
@@ -53,11 +53,17 @@ class SocketService {
 
   emit<T>(event: string, data?: T, callback?: (response: any) => void): void {
     if (this.socket) {
+      console.log("[SocketService] Emitting event:", event, "with data:", data);
       if (callback) {
         this.socket.emit(event, data, callback);
       } else {
         this.socket.emit(event, data);
       }
+    } else {
+      console.warn(
+        "[SocketService] Socket not connected, cannot emit event:",
+        event,
+      );
     }
   }
 
