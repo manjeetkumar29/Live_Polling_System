@@ -1,36 +1,37 @@
 # Live Polling System
 
-A resilient real-time polling system with two personas: Teacher and Student. Built with React, Node.js, Socket.io, and MongoDB.
+Implemented a live polling system where a teacher can create polls and students can join and vote in real time. The system keeps state across the refreshes and late joins and will also ensure that single vote per student per poll is made and uses the server as the source of truth for timers and vote counts.
 
 ## Features
 
 ### Teacher (Admin)
-- ✅ Create polls with multiple options and configurable timer duration
-- ✅ View real-time voting results as students submit
-- ✅ View poll history from database
-- ✅ Kick students from the polling session
-- ✅ Real-time chat with students
+- Create polls with multiple options and configurable timer (up to 60s).
+- Live dashboard with real-time vote percentages and counts.
+- Poll history in DB with final results.
+- Kick a student from the session (``optional feature``).
+- Real-time chat with students (``bonus feature`` ).
+- Can only ask a new question if none is active or all students answered the previous one.
 
 ### Student (User)
-- ✅ Register with a unique name per session
-- ✅ Receive questions in real-time when teacher creates a poll
-- ✅ Timer synchronization (join late = see remaining time, not full time)
-- ✅ Submit answers within time limit
-- ✅ View live results after voting
-- ✅ Chat with teacher and other students
+-   Enter a unique name on first visit and unique per browser tab/session.
+-   Receive questions instantly when teacher creates a poll.
+-   Late join starts timer from remaining time.
+-   Submit vote within time limit (max 60s).
+-   Can View live results after submitting.
+-   Chat with teacher &students .
 
-### System Behavior (Resilience)
-- ✅ State recovery on page refresh
-- ✅ Race condition prevention (one vote per student per poll)
-- ✅ Server-side timer as source of truth
-- ✅ Database persistence for polls, votes, and chat
+### System Behavior 
+-   State recovery after page refresh (fetches current poll state from backend and resumes UI).
+-   Race condition prevented.
+-   Database persistence for polls, options, votes, students and chat messages.
+
 
 ## Tech Stack
 
-- **Frontend**: React.js with TypeScript, Vite, Zustand (state management)
-- **Backend**: Node.js, Express, TypeScript
-- **Real-time**: Socket.io
-- **Database**: MongoDB with Mongoose
+- *Frontend*: React.js + TypeScript, Vite, Zustand (state management)
+- *Backend*: Node.js, Express, TypeScript
+- *Real-time*: Socket.io
+- *Database*: MongoDB with Mongoose
 
 ## Project Structure
 
