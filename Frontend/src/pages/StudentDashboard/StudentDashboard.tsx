@@ -16,37 +16,31 @@ export const StudentDashboard: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const hasReregistered = useRef(false);
-  const submissionLock = useRef(false); // Mutex to prevent race conditions
+  const submissionLock = useRef(false);
 
-  // Check if user is registered - only after hydration is complete
   useEffect(() => {
     if (_hasHydrated && (!user?.name || user.role !== 'student')) {
       navigate('/student/register');
     }
   }, [user, navigate, _hasHydrated]);
 
-  // Handle kicked status
   useEffect(() => {
     if (isKicked) {
       navigate('/kicked');
     }
   }, [isKicked, navigate]);
 
-  // Re-register student and recover state on page load/refresh
   useEffect(() => {
     const reregisterAndRecover = async () => {
       if (user?.name && user?.sessionId && !hasReregistered.current) {
         hasReregistered.current = true;
-        // Re-register student with the backend to restore session
         await registerStudent(user.sessionId, user.name);
-        // Then get current poll
         getCurrentPoll();
       }
     };
     reregisterAndRecover();
   }, [user, registerStudent, getCurrentPoll]);
 
-  // Reset selected option when poll changes
   useEffect(() => {
     if (!hasVoted) {
       setSelectedOptionId(null);
@@ -60,16 +54,13 @@ export const StudentDashboard: React.FC = () => {
   };
 
   const handleSubmitVote = async () => {
-    // Multiple validation checks to prevent race conditions
     if (!currentPoll || !selectedOptionId || hasVoted || isSubmitting) return;
     
-    // Check if poll is still active
     if (!currentPoll.isActive) {
       toast.error('This poll has ended');
       return;
     }
     
-    // Mutex lock to prevent double submission from rapid clicks
     if (submissionLock.current) return;
     submissionLock.current = true;
 
@@ -79,7 +70,6 @@ export const StudentDashboard: React.FC = () => {
       if (result.success) {
         toast.success('Vote submitted!');
       } else {
-        // If server says already voted, sync state
         if (result.message?.includes('already voted')) {
           useAppStore.getState().setHasVoted(true);
         }
@@ -99,7 +89,6 @@ export const StudentDashboard: React.FC = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Show loading while hydrating from localStorage
   if (!_hasHydrated) {
     return (
       <div className="student-dashboard">

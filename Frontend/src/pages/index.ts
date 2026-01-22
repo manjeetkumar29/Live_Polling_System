@@ -3,3 +3,4 @@ export { TeacherDashboard } from './TeacherDashboard';
 export { StudentRegister } from './StudentRegister';
 export { StudentDashboard } from './StudentDashboard';
 export { Kicked } from './Kicked';
+export { PollHistory } from './PollHistory';

@@ -40,6 +40,7 @@
   position: relative;
   overflow: hidden;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .poll-option-result.clickable {
@@ -91,16 +92,15 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 100%;
+  right: 0;
   z-index: 1;
-  border-radius: 8px;
-  overflow: hidden;
 }
 
 .option-bar {
   height: 100%;
   background: #7765DA;
   transition: width 0.3s ease;
+  border-radius: 0;
 }
 
 .option-percentage {

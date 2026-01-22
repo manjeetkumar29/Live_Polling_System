@@ -7,7 +7,6 @@ import {
 } from "../services";
 import { IOption } from "../models";
 
-// Store active poll timer
 let pollTimerInterval: NodeJS.Timeout | null = null;
 
 interface CreatePollPayload {
@@ -40,13 +39,11 @@ interface KickStudentPayload {
 }
 
 export const setupSocketHandlers = (io: Server) => {
-  // Start poll timer broadcast
   const startPollTimer = async (
     pollId: string,
     duration: number,
     startedAt: Date,
   ) => {
-    // Clear any existing timer
     if (pollTimerInterval) {
       clearInterval(pollTimerInterval);
     }
@@ -68,7 +65,6 @@ export const setupSocketHandlers = (io: Server) => {
           pollTimerInterval = null;
         }
 
-        // End the poll
         await pollService.endPoll(pollId);
         const pollWithResults = await pollService.getPollWithResults(pollId);
         io.emit("poll:ended", pollWithResults);
@@ -79,9 +75,7 @@ export const setupSocketHandlers = (io: Server) => {
   io.on("connection", async (socket: Socket) => {
     console.log("Client connected:", socket.id);
 
-    // Send current state on connection
     const sendCurrentState = async () => {
-      // Send the latest poll (active or most recently ended)
       const latestPoll = await pollService.getLatestPollWithResults();
       if (latestPoll) {
         socket.emit("poll:current", latestPoll);
@@ -96,9 +90,6 @@ export const setupSocketHandlers = (io: Server) => {
 
     await sendCurrentState();
 
-    // ==================== TEACHER EVENTS ====================
-
-    // Create a new poll
     socket.on("poll:create", async (payload: CreatePollPayload, callback) => {
       try {
         const poll = await pollService.createPoll(payload);
@@ -106,10 +97,8 @@ export const setupSocketHandlers = (io: Server) => {
           poll._id.toString(),
         );
 
-        // Start the timer
         startPollTimer(poll._id.toString(), payload.duration, poll.startedAt);
 
-        // Broadcast to all clients
         io.emit("poll:new", pollWithResults);
 
         callback?.({ success: true, poll: pollWithResults });
@@ -119,7 +108,6 @@ export const setupSocketHandlers = (io: Server) => {
       }
     });
 
-    // Get poll history
     socket.on("poll:history", async (payload, callback) => {
       try {
         console.log("[poll:history] Request received from socket:", socket.id);
@@ -132,15 +120,12 @@ export const setupSocketHandlers = (io: Server) => {
       }
     });
 
-    // Kick a student
     socket.on("student:kick", async (payload: KickStudentPayload, callback) => {
       try {
         const student = await studentService.kickStudent(payload.sessionId);
         if (student) {
-          // Notify the kicked student
           io.to(student.socketId).emit("student:kicked");
 
-          // Update student list for all clients
           const students = await studentService.getAllActiveStudents();
           io.emit("students:list", students);
 
@@ -154,9 +139,6 @@ export const setupSocketHandlers = (io: Server) => {
       }
     });
 
-    // ==================== STUDENT EVENTS ====================
-
-    // Register student
     socket.on(
       "student:register",
       async (payload: RegisterStudentPayload, callback) => {
@@ -166,10 +148,8 @@ export const setupSocketHandlers = (io: Server) => {
             socketId: socket.id,
           });
 
-          // Check if there's an active poll
           const activePoll = await pollService.getActivePollWithResults();
 
-          // Check if student has already voted
           let hasVoted = false;
           if (activePoll) {
             hasVoted = await voteService.hasStudentVoted(
@@ -178,7 +158,6 @@ export const setupSocketHandlers = (io: Server) => {
             );
           }
 
-          // Update student list for all clients
           const students = await studentService.getAllActiveStudents();
           io.emit("students:list", students);
 
@@ -195,18 +174,15 @@ export const setupSocketHandlers = (io: Server) => {
       },
     );
 
-    // Submit vote
     socket.on("vote:submit", async (payload: SubmitVotePayload, callback) => {
       try {
         const result = await voteService.submitVote(payload);
 
         if (result.success) {
-          // Get updated poll results
           const pollWithResults = await pollService.getPollWithResults(
             payload.pollId,
           );
 
-          // Broadcast updated results to all clients
           io.emit("poll:results", pollWithResults);
 
           callback?.({ success: true });
@@ -219,7 +195,6 @@ export const setupSocketHandlers = (io: Server) => {
       }
     });
 
-    // Check vote status
     socket.on(
       "vote:check",
       async (payload: { pollId: string; studentId: string }, callback) => {
@@ -236,14 +211,10 @@ export const setupSocketHandlers = (io: Server) => {
       },
     );
 
-    // ==================== CHAT EVENTS ====================
-
-    // Send chat message
     socket.on("chat:send", async (payload: ChatMessagePayload, callback) => {
       try {
         const message = await chatService.sendMessage(payload);
 
-        // Broadcast to all clients
         io.emit("chat:message", message);
 
         callback?.({ success: true, message });
@@ -253,14 +224,10 @@ export const setupSocketHandlers = (io: Server) => {
       }
     });
 
-    // ==================== COMMON EVENTS ====================
-
-    // Get current poll state (for page refresh recovery)
     socket.on(
       "poll:getCurrent",
       async (payload: { studentId?: string }, callback) => {
         try {
-          // Get the latest poll (active or most recently ended) for recovery on refresh
           const latestPoll = await pollService.getLatestPollWithResults();
 
           let hasVoted = false;
@@ -279,14 +246,11 @@ export const setupSocketHandlers = (io: Server) => {
       },
     );
 
-    // Handle disconnect
     socket.on("disconnect", async () => {
       console.log("Client disconnected:", socket.id);
-      // Optionally update student's online status here
     });
   });
 
-  // Restore timer for active poll on server restart
   const restoreActivePolLTimer = async () => {
     const activePoll = await pollService.getActivePoll();
     if (activePoll && !pollService.isPollExpired(activePoll)) {
@@ -296,7 +260,6 @@ export const setupSocketHandlers = (io: Server) => {
         activePoll.startedAt,
       );
     } else if (activePoll) {
-      // Poll has expired, end it
       await pollService.endPoll(activePoll._id.toString());
     }
   };

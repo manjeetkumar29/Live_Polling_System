@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
 const clearPollHistory = async (): Promise<void> => {
@@ -12,25 +11,25 @@ const clearPollHistory = async (): Promise<void> => {
     await mongoose.connect(mongoURI);
     console.log('MongoDB connected successfully');
 
-    // Get the database
     const db = mongoose.connection.db;
     
     if (!db) {
       throw new Error('Database connection not established');
     }
 
-    // Delete all votes
     const votesResult = await db.collection('votes').deleteMany({});
     console.log(`Deleted ${votesResult.deletedCount} votes`);
 
-    // Delete all polls
     const pollsResult = await db.collection('polls').deleteMany({});
     console.log(`Deleted ${pollsResult.deletedCount} polls`);
 
-    console.log('\n✅ Poll history cleared successfully!');
+    const messagesResult = await db.collection('messages').deleteMany({});
+    console.log(`Deleted ${messagesResult.deletedCount} messages`);
+
+    console.log('\n✅ Poll and chat history cleared successfully!');
     
   } catch (error) {
-    console.error('Error clearing poll history:', error);
+    console.error('Error clearing history:', error);
   } finally {
     await mongoose.disconnect();
     console.log('MongoDB disconnected');

@@ -36,10 +36,8 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({
     const handleConnect = () => {
       setIsConnected(true);
 
-      // On reconnection, verify state from backend
       const currentUser = useAppStore.getState().user;
       if (currentUser?.sessionId && currentUser?.role === "student") {
-        // Re-register student and recover state on reconnection
         socketService.emit(
           "student:register",
           { sessionId: currentUser.sessionId, name: currentUser.name },
@@ -49,13 +47,11 @@ export const SocketProvider: React.FC<{ children: ReactNode }> = ({
                 setCurrentPoll(response.activePoll);
                 setRemainingTime(response.activePoll.remainingTime);
               }
-              // Always trust server's hasVoted status
               setHasVoted(response.hasVoted || false);
             }
           },
         );
       } else {
-        // For teacher, just get current poll state
         socketService.emit(
           "poll:getCurrent",
           { studentId: currentUser?.sessionId },

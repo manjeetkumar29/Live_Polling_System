@@ -6,6 +6,7 @@ import {
   StudentRegister,
   StudentDashboard,
   Kicked,
+  PollHistory,
 } from './pages';
 import { SocketProvider } from './context';
 import './App.css';
@@ -27,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/teacher" element={<TeacherDashboard />} />
+          <Route path="/teacher/history" element={<PollHistory />} />
           <Route path="/student/register" element={<StudentRegister />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/kicked" element={<Kicked />} />

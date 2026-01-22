@@ -1,26 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Badge, Button } from "../../components/common";
 import { PollCreator } from "../../components/teacher/PollCreator";
-import { PollResults, PollHistory } from "../../components/poll";
+import { PollResults } from "../../components/poll";
 import { ChatPopup } from "../../components/chat";
 import { useSocket, usePollTimer } from "../../hooks";
 import { useAppStore } from "../../store";
-import type { Poll } from "../../types";
 import "./TeacherDashboard.css";
 
 export const TeacherDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { currentPoll, students, user, setUser, setCurrentPoll } =
     useAppStore();
-  const { createPoll, getPollHistory, kickStudent, getCurrentPoll } =
+  const { createPoll, kickStudent, getCurrentPoll } =
     useSocket();
-  const { formattedTime, isLowTime } = usePollTimer();
+  const { formattedTime, isLowTime, isExpired } = usePollTimer();
+
+  const canAskNewQuestion = useMemo(() => {
+    if (!currentPoll || !currentPoll.isActive) return true;
+    return isExpired;
+  }, [currentPoll, isExpired]);
   const [isCreating, setIsCreating] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [pollHistory, setPollHistory] = useState<Poll[]>([]);
   const [showPollCreator, setShowPollCreator] = useState(true);
 
-  // Set teacher name and session ID
   useEffect(() => {
     if (!user?.name) {
       setUser({
@@ -31,12 +34,10 @@ export const TeacherDashboard: React.FC = () => {
     }
   }, [user, setUser]);
 
-  // Recover state on page load
   useEffect(() => {
     getCurrentPoll();
   }, [getCurrentPoll]);
 
-  // Show poll results when a poll exists
   useEffect(() => {
     if (currentPoll) {
       setShowPollCreator(false);
@@ -64,30 +65,8 @@ export const TeacherDashboard: React.FC = () => {
     }
   };
 
-  const handleViewHistory = async () => {
-    try {
-      console.log("[TeacherDashboard] Fetching poll history...");
-      const result = await getPollHistory();
-      console.log("[TeacherDashboard] Poll history result:", result);
-
-      if (result.success && result.polls) {
-        console.log(
-          "[TeacherDashboard] Setting poll history with",
-          result.polls.length,
-          "polls",
-        );
-        setPollHistory(result.polls);
-        setShowHistory(true);
-        toast.success(`Loaded ${result.polls.length} previous polls`);
-      } else {
-        const message = result.message || "Failed to load poll history";
-        console.error("[TeacherDashboard] History fetch failed:", message);
-        toast.error(message);
-      }
-    } catch (error) {
-      console.error("[TeacherDashboard] Error fetching poll history:", error);
-      toast.error("Failed to load poll history");
-    }
+  const handleViewHistory = () => {
+    navigate("/teacher/history");
   };
 
   const handleAskNewQuestion = () => {
@@ -139,6 +118,7 @@ export const TeacherDashboard: React.FC = () => {
                 variant="primary"
                 className="ask-new-question-btn"
                 onClick={handleAskNewQuestion}
+                disabled={!canAskNewQuestion}
               >
                 + Ask a new question
               </Button>
@@ -152,13 +132,6 @@ export const TeacherDashboard: React.FC = () => {
         onKickStudent={handleKickStudent}
         isTeacher={true}
       />
-
-      {showHistory && (
-        <PollHistory
-          polls={pollHistory}
-          onClose={() => setShowHistory(false)}
-        />
-      )}
     </div>
   );
 };

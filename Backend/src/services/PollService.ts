@@ -30,9 +30,7 @@ interface PollWithResults {
 }
 
 class PollService {
-  // Create a new poll
   async createPoll(data: CreatePollData): Promise<IPoll> {
-    // First, deactivate any active polls
     await Poll.updateMany({ isActive: true }, { isActive: false, endedAt: new Date() });
 
     const poll = new Poll({
@@ -47,12 +45,10 @@ class PollService {
     return poll;
   }
 
-  // Get the currently active poll
   async getActivePoll(): Promise<IPoll | null> {
     return Poll.findOne({ isActive: true });
   }
 
-  // Get poll by ID with results
   async getPollWithResults(pollId: string): Promise<PollWithResults | null> {
     const poll = await Poll.findById(pollId);
     if (!poll) return null;
@@ -89,14 +85,12 @@ class PollService {
     };
   }
 
-  // Get active poll with results
   async getActivePollWithResults(): Promise<PollWithResults | null> {
     const poll = await this.getActivePoll();
     if (!poll) return null;
     return this.getPollWithResults(poll._id.toString());
   }
 
-  // End a poll
   async endPoll(pollId: string): Promise<IPoll | null> {
     return Poll.findByIdAndUpdate(
       pollId,
@@ -105,8 +99,7 @@ class PollService {
     );
   }
 
-  // Get poll history
-  async getPollHistory(limit: number = 20): Promise<PollWithResults[]> {
+  async getPollHistory(limit: number = 10): Promise<PollWithResults[]> {
     const polls = await Poll.find({ isActive: false })
       .sort({ createdAt: -1 })
       .limit(limit);
@@ -123,31 +116,25 @@ class PollService {
     return pollsWithResults;
   }
 
-  // Check if poll has expired
   isPollExpired(poll: IPoll): boolean {
     const now = new Date();
     const endTime = new Date(poll.startedAt.getTime() + poll.duration * 1000);
     return now >= endTime;
   }
 
-  // Get remaining time for a poll
   getRemainingTime(poll: IPoll): number {
     const now = new Date();
     const endTime = new Date(poll.startedAt.getTime() + poll.duration * 1000);
     return Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 1000));
   }
 
-  // Get the latest poll (active or most recently ended)
   async getLatestPoll(): Promise<IPoll | null> {
-    // First try to get active poll
     const activePoll = await Poll.findOne({ isActive: true });
     if (activePoll) return activePoll;
 
-    // Otherwise get the most recently created poll
     return Poll.findOne().sort({ createdAt: -1 });
   }
 
-  // Get latest poll with results
   async getLatestPollWithResults(): Promise<PollWithResults | null> {
     const poll = await this.getLatestPoll();
     if (!poll) return null;

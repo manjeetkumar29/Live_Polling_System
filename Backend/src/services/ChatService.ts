@@ -8,7 +8,6 @@ interface SendMessageData {
 }
 
 class ChatService {
-  // Send a message
   async sendMessage(data: SendMessageData): Promise<IMessage> {
     const message = new Message({
       senderId: data.senderId,
@@ -21,7 +20,6 @@ class ChatService {
     return message;
   }
 
-  // Get recent messages
   async getRecentMessages(limit: number = 50): Promise<IMessage[]> {
     return Message.find()
       .sort({ createdAt: -1 })
@@ -29,7 +27,6 @@ class ChatService {
       .then((messages) => messages.reverse());
   }
 
-  // Clear all messages (optional admin function)
   async clearMessages(): Promise<void> {
     await Message.deleteMany({});
   }

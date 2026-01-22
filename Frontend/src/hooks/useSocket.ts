@@ -6,7 +6,6 @@ import type { Poll, Message } from "../types";
 export const useSocket = () => {
   const { user, setCurrentPoll, setRemainingTime, setHasVoted } = useAppStore();
 
-  // Register student
   const registerStudent = useCallback(
     (sessionId: string, name: string) => {
       return new Promise<{
@@ -31,7 +30,6 @@ export const useSocket = () => {
     [setCurrentPoll, setRemainingTime, setHasVoted],
   );
 
-  // Create poll
   const createPoll = useCallback(
     (
       question: string,
@@ -53,7 +51,6 @@ export const useSocket = () => {
     [],
   );
 
-  // Submit vote
   const submitVote = useCallback(
     (pollId: string, optionId: string) => {
       return new Promise<{ success: boolean; message?: string }>((resolve) => {
@@ -77,7 +74,6 @@ export const useSocket = () => {
     [user, setHasVoted],
   );
 
-  // Get poll history
   const getPollHistory = useCallback(() => {
     return new Promise<{ success: boolean; polls?: Poll[]; message?: string }>(
       (resolve) => {
@@ -93,7 +89,6 @@ export const useSocket = () => {
     );
   }, []);
 
-  // Kick student
   const kickStudent = useCallback((sessionId: string) => {
     return new Promise<{ success: boolean; message?: string }>((resolve) => {
       socketService.emit("student:kick", { sessionId }, (response: any) => {
@@ -102,7 +97,6 @@ export const useSocket = () => {
     });
   }, []);
 
-  // Send chat message
   const sendMessage = useCallback(
     (content: string) => {
       return new Promise<{ success: boolean; message?: Message }>((resolve) => {
@@ -123,7 +117,6 @@ export const useSocket = () => {
     [user],
   );
 
-  // Get current poll (for state recovery)
   const getCurrentPoll = useCallback(() => {
     return new Promise<{ success: boolean; poll?: Poll; hasVoted?: boolean }>(
       (resolve) => {
